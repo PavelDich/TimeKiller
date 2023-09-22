@@ -17,7 +17,8 @@ public class Player : NetworkBehaviour
         public Transform _transform;
         public Rigidbody _rigidbody;
         public CapsuleCollider _collider;
-        public Animator _animator;
+        public Animator _animatorPlayer;
+        public Animator _animatorMenu;
     }
 
     public Controller controller;
@@ -156,6 +157,20 @@ public class Player : NetworkBehaviour
             if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
             Parameters();
             if (Input.GetKeyDown(KeyCode.H)) ChangeHealth(controller.parameters.health.Health - 10);
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (components._animatorMenu.GetBool("isActive"))
+                {
+                    components._animatorMenu.SetBool("isActive", false);
+                    Cursor.lockState = CursorLockMode.Locked;
+                    SettingsImport();
+                }
+                else
+                {
+                    components._animatorMenu.SetBool("isActive", true);
+                    Cursor.lockState = CursorLockMode.None;
+                }
+            }
         }
     }
 
@@ -209,7 +224,7 @@ public class Player : NetworkBehaviour
         {
             MoveBody(horizontal, vertical, controller.body.SprintSpeed, controller.body.SprintStaminaNeed);
             controller.body.isSprint = true;
-//            components._animator.SetBool("isCrawl", false);
+            //            components._animator.SetBool("isCrawl", false);
             controller.parameters.stamina.RegenReloadTimeLeft = controller.parameters.stamina.RegenReload;
             controller.parameters.stamina.OldValue = controller.parameters.stamina.BarDiff.fillAmount;
             components._collider.height = 2f;
@@ -218,21 +233,21 @@ public class Player : NetworkBehaviour
         {
             MoveBody(horizontal, vertical, controller.body.CrawlSpeed, controller.body.CrawlStaminaNeed);
             controller.body.isSprint = false;
-//            components._animator.SetBool("isCrawl", true);
+            //            components._animator.SetBool("isCrawl", true);
             components._collider.height = controller.body.CrawlSize;
         }
         else if (!Physics.Raycast(components._transform.position, Vector3.up, controller.body.CrawlHeight, controller.body.Ground))
         {
             MoveBody(horizontal, vertical, controller.body.WalkSpeed, controller.body.WalkStaminaNeed);
             controller.body.isSprint = false;
-//            components._animator.SetBool("isCrawl", false);
+            //            components._animator.SetBool("isCrawl", false);
             components._collider.height = 2f;
         }
         else
         {
             MoveBody(horizontal, vertical, controller.body.CrawlSpeed, controller.body.CrawlStaminaNeed);
             controller.body.isSprint = false;
-//            components._animator.SetBool("isCrawl", true);
+            //            components._animator.SetBool("isCrawl", true);
             components._collider.height = controller.body.CrawlSize;
         }
     }
@@ -272,13 +287,6 @@ public class Player : NetworkBehaviour
 
         controller.mainCamera.eulerY = (transform.rotation.eulerAngles.y + mouseX * sensitivityX * Time.deltaTime) % 360;
         transform.rotation = Quaternion.Euler(0, controller.mainCamera.eulerY, 0);
-
-
-
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
     }
 
 
