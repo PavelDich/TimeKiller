@@ -1,55 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Mamont : Enemy
 {
-
-    private bool _mamontIsDead;
-    private float _sphereRadius = 15;
-    private float timeLeftWander = 0f;
-    [SerializeField] private GameObject mamont;
-    [SerializeField] private LayerMask playerLayer;
-    [SerializeField] private float wanderDistance = 10f;
-    [SerializeField] private float timeWander = 10f;
-    public NavMeshAgent pathfinder;
-
+    private bool isAgr;
     private void Update()
     {
-        timeLeftWander -= Time.deltaTime;
-        if (timeLeftWander < 0)
+        _timeLeftWander -= Time.deltaTime;
+        if (_timeLeftWander < 0 && !isAgr)
         {
-            MamontJerk();
             pathfinder.SetDestination(RandomNavSphere(transform.position, wanderDistance));
-            timeLeftWander = timeWander;
+            _timeLeftWander = timeWander;
         }
     }
 
-    public void MamontJerk()
+    private void OnTriggerEnter(Collider col)
     {
-        Collider[] hitColiders = Physics.OverlapSphere(mamont.transform.position, _sphereRadius, playerLayer);
-        foreach (var item in hitColiders)
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
         {
-            if (item != null)
-            {
-            Debug.Log("1");
-                mamont.transform.LookAt(hitColiders[0].transform.position);
-                mamont.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -10);
-            }
+            pathfinder.speed = 50f;
+            pathfinder.SetDestination(col.transform.position);
+            isAgr = true;
         }
-
-
     }
 
-    public Vector3 RandomNavSphere(Vector3 origin, float distance)
+    private void OnTriggerStay(Collider col)
     {
-        
-        
-        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * distance;
-        randomDirection += origin;
-        NavMeshHit navHit;
-        NavMesh.SamplePosition(randomDirection, out navHit, distance, -1);
-        return navHit.position;
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
+        {
+            pathfinder.SetDestination(col.transform.position);
+        }
+    }
+
+    private void OnTriggerExit(Collider col)
+    {
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
+        {
+            isAgr = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision col)
+    {
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
+        {
+            Debug.Log("Damage");
+            pathfinder.speed = 3.5f;
+        }
     }
 }
