@@ -11,6 +11,7 @@ public class MenuSetting : MonoBehaviour
     {
         public string SaveName;
         public TMP_InputField inputField;
+        public string ParameterName;
     }
     public ButtonData[] buttonData;
     [Serializable]
@@ -48,10 +49,10 @@ public class MenuSetting : MonoBehaviour
         {
             TMP_Text a = i.inputField.placeholder.GetComponent<TMP_Text>();
 
-            a.text = PlayerPrefs.GetString(i.SaveName);
+            a.text = i.ParameterName + PlayerPrefs.GetString(i.SaveName);
 
-            if (a.text == "" || a.text == null)
-                a.text = "100";
+            if (PlayerPrefs.GetString(i.SaveName) == "" || PlayerPrefs.GetString(i.SaveName) == null)
+                a.text = i.ParameterName + "100";
         }
     }
 

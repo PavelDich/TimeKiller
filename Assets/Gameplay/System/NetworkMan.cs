@@ -54,14 +54,14 @@ public class NetworkMan : NetworkManager
         }
     }
 
-    public void Connect(int SceneID, string IpAdress)
+    public void Connect(int SceneID)
     {
-        //if (!NetworkClient.isConnected && !NetworkServer.active && !string.IsNullOrWhiteSpace(IpAdress))
-        //{
-        networkAddress = IpAdress;
-        StartClient();
-        if (isNetworkActive) SceneManager.LoadScene(SceneID);
-        //}
+        if (!NetworkClient.isConnected && !NetworkServer.active)
+        {
+            networkAddress = PlayerPrefs.GetString("ConnectIP");
+            StartClient();
+            if (isNetworkActive) SceneManager.LoadScene(SceneID);
+        }
     }
 
     private void LoadScene(int Scane)

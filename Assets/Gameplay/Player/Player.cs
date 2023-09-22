@@ -176,8 +176,8 @@ public class Player : NetworkBehaviour
 
     public void SettingsImport()
     {
-        controller.mainCamera.SensativityX = float.Parse(PlayerPrefs.GetString("SettingsControlSensativityX"));
-        controller.mainCamera.SensativityY = float.Parse(PlayerPrefs.GetString("SettingsControlSensativityY"));
+        controller.mainCamera.SensativityX = float.Parse(PlayerPrefs.GetString("SettingsPlayerCameraSensitivityX"));
+        controller.mainCamera.SensativityY = float.Parse(PlayerPrefs.GetString("SettingsPlayerCameraSensitivityY"));
         controller.iD.id = PlayerPrefs.GetInt("ControllerID");
         for (int i = 0; i < controller.iD.obj.Length; i++)
         {
@@ -218,7 +218,7 @@ public class Player : NetworkBehaviour
         {
             MoveBody(horizontal, vertical, controller.body.SprintSpeed, controller.body.SprintStaminaNeed);
             controller.body.isSprint = true;
-            components._animator.SetBool("isCrawl", false);
+//            components._animator.SetBool("isCrawl", false);
             controller.parameters.stamina.RegenReloadTimeLeft = controller.parameters.stamina.RegenReload;
             controller.parameters.stamina.OldValue = controller.parameters.stamina.BarDiff.fillAmount;
             components._collider.height = 2f;
@@ -227,21 +227,21 @@ public class Player : NetworkBehaviour
         {
             MoveBody(horizontal, vertical, controller.body.CrawlSpeed, controller.body.CrawlStaminaNeed);
             controller.body.isSprint = false;
-            components._animator.SetBool("isCrawl", true);
+//            components._animator.SetBool("isCrawl", true);
             components._collider.height = controller.body.CrawlSize;
         }
         else if (!Physics.Raycast(components._transform.position, Vector3.up, controller.body.CrawlHeight, controller.body.Ground))
         {
             MoveBody(horizontal, vertical, controller.body.WalkSpeed, controller.body.WalkStaminaNeed);
             controller.body.isSprint = false;
-            components._animator.SetBool("isCrawl", false);
+//            components._animator.SetBool("isCrawl", false);
             components._collider.height = 2f;
         }
         else
         {
             MoveBody(horizontal, vertical, controller.body.CrawlSpeed, controller.body.CrawlStaminaNeed);
             controller.body.isSprint = false;
-            components._animator.SetBool("isCrawl", true);
+//            components._animator.SetBool("isCrawl", true);
             components._collider.height = controller.body.CrawlSize;
         }
     }
