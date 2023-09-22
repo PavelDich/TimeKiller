@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Mirror;
 using UnityEngine.SceneManagement;
 using UnityEngine;
@@ -33,15 +31,6 @@ public class NetworkMan : NetworkManager
     {
         base.OnClientConnect();
     }
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.Space) && !playerSpawned)
-        //{
-        //ActivatePlayerSpawn();
-        //}
-    }
-
-
 
 
 
@@ -54,14 +43,19 @@ public class NetworkMan : NetworkManager
         }
     }
 
-    public void Connect(int SceneID)
+    public void Connect(int SceneID, string IpAdress)
     {
         if (!NetworkClient.isConnected && !NetworkServer.active)
         {
-            networkAddress = PlayerPrefs.GetString("ConnectIP");
+            networkAddress = IpAdress;
             StartClient();
             if (isNetworkActive) SceneManager.LoadScene(SceneID);
         }
+    }
+
+    public void Disconnect()
+    {
+        NetworkClient.Disconnect();
     }
 
     private void LoadScene(int Scane)

@@ -156,15 +156,6 @@ public class Player : NetworkBehaviour
             if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
             Parameters();
             if (Input.GetKeyDown(KeyCode.H)) ChangeHealth(controller.parameters.health.Health - 10);
-            if (Input.GetKeyDown(KeyCode.R))
-                for (int i = 0; i < controller.iD.obj.Length; i++)
-                {
-                    foreach (GameObject e in controller.iD.obj[i].o)
-                    {
-                        if (i == controller.iD.id) e.SetActive(true);
-                        else e.SetActive(false);
-                    }
-                }
         }
     }
 
