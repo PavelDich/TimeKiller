@@ -5,6 +5,7 @@ using UnityEngine;
 public class Mamont : Enemy
 {
     private bool isAgr;
+    public Animator enamyAnim;
 
     private void Update()
     {
@@ -14,6 +15,10 @@ public class Mamont : Enemy
             pathfinder.SetDestination(RandomNavSphere(transform.position, wanderDistance));
             _timeLeftWander = timeWander;
         }
+
+        if (pathfinder.isStopped)
+            enamyAnim.SetInteger("IdMove", 0);
+        else enamyAnim.SetInteger("IdMove", 1);
     }
 
     private void OnTriggerEnter(Collider col)
@@ -42,5 +47,11 @@ public class Mamont : Enemy
         }
     }
 
-   
+    private void OnCollisionEnter(Collision col)
+    {
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
+        {
+            enamyAnim.SetInteger("IdMove", 2);
+        }
+    }
 }
