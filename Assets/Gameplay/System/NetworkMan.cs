@@ -67,7 +67,7 @@ public class NetworkMan : NetworkManager
         NetworkClient.Disconnect();
     }
 
-    private void LoadScene(int Scane)
+    public void LoadScene(int Scane)
     {
         SceneManager.LoadScene(Scane);
     }

@@ -1,12 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Security.Principal;
+using Mirror;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class Mamont : Enemy
 {
     private bool isAgr;
+
+
+
     private void Update()
     {
         _timeLeftWander -= Time.deltaTime;
@@ -48,6 +49,7 @@ public class Mamont : Enemy
         if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
         {
             Debug.Log("Damage");
+            ChangeHealth(Health - 1);
             pathfinder.speed = 3.5f;
         }
     }

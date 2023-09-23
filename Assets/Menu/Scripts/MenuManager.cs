@@ -14,9 +14,10 @@ public class MenuManager : MonoBehaviour
         Manager.networkMan.Connect(ScaneId, PlayerPrefs.GetString("ConnectIP"));
     }
 
-    public void Disconnect()
+    public void Disconnect(int ScaneID)
     {
         Manager.networkMan.Disconnect();
+        Manager.networkMan.LoadScene(ScaneID);
     }
 
     public void Exit()

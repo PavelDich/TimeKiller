@@ -6,25 +6,28 @@ using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
-    [SyncVar]
-    public bool isGameStarted = false;
-    public void ChangeIsGameStarted(bool newValue)
-    {
-        if (isServer)
-            SyncIsGameStarted(newValue);
-        else
-            CmdSyncIsGameStarted(newValue);
-
-        [Server]
-        void SyncIsGameStarted(bool newValue)
-        { isGameStarted = newValue; }
-        [Command]
-        void CmdSyncIsGameStarted(bool newValue)
-        { isGameStarted = newValue; }
-    }
-
     public void Awake()
     {
         Manager.gameManager = this;
     }
+
+    [SyncVar(hook = nameof(SetIsGameStarted))]
+    public bool _isGameStarted = false;
+    public bool isGameStarted = false;
+    public void ChangeIsGameStarted(bool newValue)
+    {
+        if (isServer)
+            SyncisGameStarted(newValue);
+        else
+            CmdSyncIsGameStarted(newValue);
+
+        [Server]
+        void SyncisGameStarted(bool newValue)
+        { _isGameStarted = newValue; }
+        [Command]
+        void CmdSyncIsGameStarted(bool newValue)
+        { _isGameStarted = newValue; }
+    }
+    public void SetIsGameStarted(bool oldValue, bool newValue) { isGameStarted = newValue; }
 }
+

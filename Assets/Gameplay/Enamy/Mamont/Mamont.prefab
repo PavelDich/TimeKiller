@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2540109588364942489}
   - component: {fileID: 4186194421730549875}
   m_Layer: 0
-  m_Name: Enamy
+  m_Name: Mamont
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

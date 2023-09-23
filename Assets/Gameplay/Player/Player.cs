@@ -68,6 +68,7 @@ public class Player : NetworkBehaviour
         {
             //public VideCamera videCamera;
             public Camera camera;
+            public Transform heck;
             public float SensativityX;
             public float SensativityY;
             [HideInInspector]
@@ -149,7 +150,7 @@ public class Player : NetworkBehaviour
                 if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
                 Parameters();
                 if (Input.GetKeyDown(KeyCode.H)) ChangeHealth(controller.parameters.health.Health - 10);
-                if (Input.GetKeyDown(KeyCode.V)) Manager.gameManager.isGameStarted = !Manager.gameManager.isGameStarted;
+                if (Input.GetKeyDown(KeyCode.B)) Manager.gameManager.ChangeIsGameStarted(!Manager.gameManager._isGameStarted);
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -265,7 +266,7 @@ public class Player : NetworkBehaviour
     {
         controller.mainCamera.eulerX -= mouseY * sensitivityY * Time.deltaTime;
         controller.mainCamera.eulerX = Mathf.Clamp(controller.mainCamera.eulerX, -80f, 80f);
-        controller.mainCamera.camera.transform.localRotation = Quaternion.Euler(controller.mainCamera.eulerX, 0, 0);
+        controller.mainCamera.heck.transform.localRotation = Quaternion.Euler(controller.mainCamera.eulerX, 0, 0);
 
         controller.mainCamera.eulerY = (transform.rotation.eulerAngles.y + mouseX * sensitivityX * Time.deltaTime) % 360;
         transform.rotation = Quaternion.Euler(0, controller.mainCamera.eulerY, 0);
