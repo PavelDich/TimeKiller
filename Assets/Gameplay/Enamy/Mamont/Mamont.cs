@@ -1,5 +1,4 @@
 using System.Security.Principal;
-using Mirror;
 using UnityEngine;
 
 public class Mamont : Enemy
@@ -52,7 +51,7 @@ public class Mamont : Enemy
         if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
         {
             Player pl = col.gameObject.GetComponent<Player>();
-            pl.ChangeHealth(pl.controller.parameters.health.Health - Damage);
+            //pl.Parameters.health -= Damage;
         }
     }
 }

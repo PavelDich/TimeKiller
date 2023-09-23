@@ -11,7 +11,7 @@ public class poop : MonoBehaviour
         if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
         {
             Player pl = col.GetComponent<Player>();
-            pl.ChangeHealth(pl.controller.parameters.health.Health - Damage);
+            //pl.parameters.health -= Damage;
         }
     }
 }

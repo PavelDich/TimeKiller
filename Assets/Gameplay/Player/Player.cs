@@ -1,5 +1,4 @@
 using System.Collections;
-using Mirror;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -7,9 +6,8 @@ using Unity.VisualScripting;
 using UnityEngine.Rendering;
 using UnityEngine.AI;
 
-public class Player : NetworkBehaviour
+public class Player : MonoBehaviour
 {
-    #region Parameters
     public Components components;
     [System.Serializable]
     public class Components
@@ -130,51 +128,9 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [SyncVar(hook = nameof(SetHealth))]
-    public float _Health = 100f;
-    public void ChangeHealth(float newValue)
-    {
-        if (isServer)
-            SyncHealth(newValue);
-        else
-            CmdSyncHealth(newValue);
-
-        [Server]
-        void SyncHealth(float newValue)
-        { _Health = newValue; }
-        [Command]
-        void CmdSyncHealth(float newValue)
-        { _Health = newValue; }
-    }
-    public void SetHealth(float oldValue, float newValue)
-    {
-        controller.parameters.health.Health = newValue;
-        if (controller.parameters.health.Health <= 0f) controller.parameters.isDeath = true;
-        else controller.parameters.isDeath = false;
-        if (newValue <= oldValue)
-        {
-            controller.parameters.health.RegenReloadTimeLeft = controller.parameters.health.RegenReload;
-            controller.parameters.health.OldValue = controller.parameters.health.BarDiff.fillAmount;
-        }
-    }
-    #endregion
-
-
-    private void Start()
-    {
-        if (!isOwned)
-            foreach (GameObject i in controller.localObjects)
-                i.SetActive(false);
-        else
-        {
-            components.PersRender.SetActive(false);
-            SettingsImport();
-        }
-    }
-
     private void FixedUpdate()
     {
-        if (isOwned && controller.isActive && !controller.parameters.isDeath)
+        if (controller.isActive && !controller.parameters.isDeath)
         {
             Move(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), Input.GetKey(KeyCode.LeftShift), Input.GetKey(KeyCode.LeftControl));
         }
@@ -183,76 +139,21 @@ public class Player : NetworkBehaviour
 
     private void Update()
     {
-        if (isOwned)
+        if (controller.isActive && !controller.parameters.isDeath)
         {
-            if (controller.isActive && !controller.parameters.isDeath)
-            {
-                MoveHead(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), controller.mainCamera.SensativityX, controller.mainCamera.SensativityY);
-                if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
-                if (Input.GetMouseButtonDown(0)) GrabItemLeft();
-                if (Input.GetMouseButtonDown(1)) GrabItemRight();
-            }
-            else Move(0f, 0f, false, false);
-
-            Parameters();
-            if (Input.GetKeyDown(KeyCode.Escape))
-                OpenMenu();
+            MoveHead(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), controller.mainCamera.SensativityX, controller.mainCamera.SensativityY);
+            if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
         }
+        else Move(0f, 0f, false, false);
+
+        Parameters();
+        if (Input.GetKeyDown(KeyCode.Escape))
+            OpenMenu();
     }
 
 
 
 
-
-    public void GrabItemLeft()
-    {
-        if (controller.body.hands.InLeftHand == null)
-        {
-            RaycastHit[] ray = Physics.RaycastAll(controller.mainCamera.camera.transform.position,
-            controller.mainCamera.camera.transform.forward, controller.body.hands.GrabDistance, controller.body.hands.layerItem);
-
-            if (ray.Length > 0)
-            {
-                controller.body.hands.InLeftHand = ray[0].collider.gameObject.GetComponent<Item>();
-                controller.body.hands.InLeftHandRigidbody = controller.body.hands.InLeftHand.GetComponent<Rigidbody>();
-            }
-        }
-        else
-        {
-            controller.body.hands.InLeftHand.transform.SetParent(null, true);
-            controller.body.hands.InLeftHandRigidbody.isKinematic = false;
-            controller.body.hands.InLeftHandRigidbody.AddRelativeForce(controller.body.hands.DropVelocity);
-            controller.body.hands.InLeftHand = null;
-        }
-    }
-
-    public void GrabItemRight()
-    {
-        if (controller.body.hands.InRightHand == null)
-        {
-            RaycastHit[] ray = Physics.RaycastAll(controller.mainCamera
-            .camera.transform.position,
-            controller.mainCamera.camera.transform.forward, controller.body.hands.GrabDistance, controller.body.hands.layerItem);
-
-            if (ray.Length > 0)
-            {
-                controller.body.hands.InRightHand = ray[0].collider.gameObject.GetComponent<Item>();
-                controller.body.hands.InRightHandRigidbody = controller.body.hands.InRightHand.GetComponent<Rigidbody>();
-
-                controller.body.hands.InRightHand.transform.SetParent(controller.body.hands.RightHand.gameObject.transform, false);
-                controller.body.hands.InRightHandRigidbody.isKinematic = true;
-                controller.body.hands.InRightHand.transform.position = controller.body.hands.RightHand.position;
-                controller.body.hands.InRightHand.transform.rotation = controller.body.hands.RightHand.rotation;
-            }
-        }
-        else
-        {
-            controller.body.hands.InRightHand.transform.SetParent(null, true);
-            controller.body.hands.InRightHandRigidbody.isKinematic = false;
-            controller.body.hands.InRightHandRigidbody.AddRelativeForce(controller.body.hands.DropVelocity);
-            controller.body.hands.InRightHand = null;
-        }
-    }
 
     public void OpenMenu()
     {
