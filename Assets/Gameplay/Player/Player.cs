@@ -338,7 +338,8 @@ public class Player : NetworkBehaviour
 
     public void AddHands(Item item)
     {
-        if (controller.body.hands.items[controller.body.hands.handId] == null)
+        if (controller.body.hands.handId >= 0 && controller.body.hands.handId < controller.body.hands.items.Length &&
+       controller.body.hands.items[controller.body.hands.handId] == null)
         {
             item.transform.SetParent(controller.body.hands.hand, false);
             item.GetComponent<Rigidbody>().isKinematic = true;

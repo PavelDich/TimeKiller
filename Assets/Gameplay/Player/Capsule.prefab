@@ -4268,8 +4268,8 @@ MonoBehaviour:
     parameters:
       isDeath: 0
       health:
-        Max: 100
-        Health: 100
+        Max: 1e+11
+        Health: 1e+12
         Regen: 0.25
         RegenReload: 25
         Bar: {fileID: 4726722553049043469}
@@ -4277,8 +4277,8 @@ MonoBehaviour:
         RegenReloadTimeLeft: 0
         OldValue: 0
       stamina:
-        Max: 100
-        Stamina: 100
+        Max: 1e+11
+        Stamina: 1e+15
         Regen: 1
         RegenReload: 5
         Bar: {fileID: 884571132286337748}
