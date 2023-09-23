@@ -6,6 +6,7 @@ using UnityEngine.AI;
 
 public class Enemy : NetworkBehaviour
 {
+    public float Damage = 20f;
     public NavMeshAgent pathfinder;
     public LayerMask playerLayer;
     public float wanderDistance = 10f;

@@ -346,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c1792e5f9f831e41b918b6e4f7d3114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Anim: {fileID: 0}
+  Anim: {fileID: 2273550118198742431}
 --- !u!82 &7571472215289698581
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4234,11 +4234,12 @@ MonoBehaviour:
     - {fileID: 8734247691264251974}
     - {fileID: 3026608514482065384}
     parameters:
+      isDeath: 0
       health:
         Max: 100
         Health: 100
-        Regen: 1
-        RegenReload: 5
+        Regen: 0.25
+        RegenReload: 25
         Bar: {fileID: 4726722553049043469}
         BarDiff: {fileID: 4331228637460647304}
         RegenReloadTimeLeft: 0

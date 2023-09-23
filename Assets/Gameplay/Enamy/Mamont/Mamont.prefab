@@ -95,6 +95,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Damage: 50
   pathfinder: {fileID: 696736125180268426}
   playerLayer:
     serializedVersion: 2
