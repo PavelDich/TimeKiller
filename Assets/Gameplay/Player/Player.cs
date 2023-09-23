@@ -114,6 +114,8 @@ public class Player : NetworkBehaviour
                 public LayerMask MaskItems;
                 public int maxItems;
                 public Item[] items;
+
+                public Vector3 DropItem;
             }
         }
     }
@@ -152,7 +154,7 @@ public class Player : NetworkBehaviour
     {
         if (!isOwned)
             foreach (GameObject i in controller.localObjects)
-                Destroy(i);
+                i.SetActive(false);
         else
         {
             components.PersRender.SetActive(false);
@@ -180,12 +182,13 @@ public class Player : NetworkBehaviour
                 //if (Input.GetKeyDown(KeyCode.B)) Manager.gameManager.ChangeIsGameStarted(!Manager.gameManager._isGameStarted);
                 if (Input.GetMouseButtonDown(1))
                 {
-                    AddHands(Physics.RaycastAll(controller.mainCamera.camera.transform.position,
+                    Item i = Physics.RaycastAll(controller.mainCamera.camera.transform.position,
                         controller.mainCamera.camera.transform.forward,
                         controller.body.hands.HandsScale,
-                        controller.body.hands.MaskItems)[0].collider.GetComponent<Item>());
-                    SetHands();
+                        controller.body.hands.MaskItems)[0].collider.GetComponent<Item>();
+                    if (i != null) AddHands(i);
                 }
+                SetHands();
             }
             else Move(0f, 0f, false, false);
 
@@ -335,7 +338,13 @@ public class Player : NetworkBehaviour
 
     public void AddHands(Item item)
     {
-        if (controller.body.hands.items[controller.body.hands.handId] = null) controller.body.hands.items[controller.body.hands.handId] = item;
+        if (controller.body.hands.items[controller.body.hands.handId] == null)
+        {
+            item.transform.SetParent(controller.body.hands.hand, false);
+            item.GetComponent<Rigidbody>().isKinematic = true;
+            item.transform.position = controller.body.hands.hand.transform.position;
+            item.transform.rotation = controller.body.hands.hand.transform.rotation;
+        };
     }
 
     public void SetHands()
@@ -359,8 +368,23 @@ public class Player : NetworkBehaviour
             controller.body.hands.handId = 0;
 
 
+        for (int i = 0; i < controller.body.hands.items.Length; i++)
+        {
+            if (i == controller.body.hands.handId)
+                controller.body.hands.items[controller.body.hands.handId].gameObject.SetActive(true);
+            else
+                controller.body.hands.items[controller.body.hands.handId].gameObject.SetActive(false);
+        }
+
+        if (Input.GetMouseButtonDown(0) && controller.body.hands.items[controller.body.hands.handId] != null)
+            controller.body.hands.items[controller.body.hands.handId].Use();
+
         if (Input.GetKeyDown(KeyCode.Q))
-        { controller.body.hands.items[controller.body.hands.handId].gameObject.SetActive(true);}
+        {
+            controller.body.hands.items[controller.body.hands.handId].transform.SetParent(null, false);
+            controller.body.hands.items[controller.body.hands.handId].GetComponent<Rigidbody>().isKinematic = false;
+            controller.body.hands.items[controller.body.hands.handId].GetComponent<Rigidbody>().AddForce(controller.body.hands.DropItem);
+        }
     }
 
 
