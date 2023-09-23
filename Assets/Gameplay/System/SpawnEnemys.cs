@@ -6,6 +6,7 @@ public class SpawnEnemys : NetworkBehaviour
     public GameObject enemyPrefab;
     public void Start()
     {
-        NetworkServer.Spawn(Instantiate(enemyPrefab, transform));
+        GameObject go = Instantiate(enemyPrefab, transform)
+        NetworkServer.Spawn();
     }
 }

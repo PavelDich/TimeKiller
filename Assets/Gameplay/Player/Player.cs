@@ -18,6 +18,7 @@ public class Player : NetworkBehaviour
         public Rigidbody _rigidbody;
         public CapsuleCollider _collider;
         public Animator _animatorPlayer;
+        public GameObject PersRender;
         public Animator _animatorMenu;
     }
 
@@ -129,7 +130,10 @@ public class Player : NetworkBehaviour
             foreach (GameObject i in controller.localObjects)
                 Destroy(i);
         else
+        {
+            components.PersRender.SetActive(false);
             SettingsImport();
+        }
     }
 
     private void FixedUpdate()
@@ -166,6 +170,7 @@ public class Player : NetworkBehaviour
 
     public void OpenMenu()
     {
+        Move(0f, 0f, false, true);
         controller.isActive = !controller.isActive;
         components._animatorMenu.SetBool("isActive", !controller.isActive);
         Cursor.visible = !controller.isActive;
@@ -207,33 +212,54 @@ public class Player : NetworkBehaviour
         {
             MoveBody(horizontal, vertical, controller.body.SprintSpeed, controller.body.SprintStaminaNeed);
             controller.body.isSprint = true;
-            //            components._animator.SetBool("isCrawl", false);
             controller.parameters.stamina.RegenReloadTimeLeft = controller.parameters.stamina.RegenReload;
             controller.parameters.stamina.OldValue = controller.parameters.stamina.BarDiff.fillAmount;
             components._collider.height = 2f;
+            controller.mainCamera.camera.transform.localPosition = new Vector3(0, 0.25f, 0);
+
+            if (horizontal == 0f && vertical == 0f)
+                components._animatorPlayer.SetInteger("IdMove", 0);
+            else
+                components._animatorPlayer.SetInteger("IdMove", 3);
         }
         else if (control)
         {
             MoveBody(horizontal, vertical, controller.body.CrawlSpeed, controller.body.CrawlStaminaNeed);
             controller.body.isSprint = false;
-            //            components._animator.SetBool("isCrawl", true);
             components._collider.height = controller.body.CrawlSize;
+            controller.mainCamera.camera.transform.localPosition = Vector3.zero;
+
+            if (horizontal == 0f && vertical == 0f)
+                components._animatorPlayer.SetInteger("IdMove", 2);
+            else
+                components._animatorPlayer.SetInteger("IdMove", 1);
         }
         else if (!Physics.Raycast(components._transform.position, Vector3.up, controller.body.CrawlHeight, controller.body.Ground))
         {
             MoveBody(horizontal, vertical, controller.body.WalkSpeed, controller.body.WalkStaminaNeed);
             controller.body.isSprint = false;
-            //            components._animator.SetBool("isCrawl", false);
             components._collider.height = 2f;
+            controller.mainCamera.camera.transform.localPosition = new Vector3(0, 0.25f, 0);
+
+            if (horizontal == 0f && vertical == 0f)
+                components._animatorPlayer.SetInteger("IdMove", 0);
+            else
+                components._animatorPlayer.SetInteger("IdMove", 3);
         }
         else
         {
             MoveBody(horizontal, vertical, controller.body.CrawlSpeed, controller.body.CrawlStaminaNeed);
             controller.body.isSprint = false;
-            //            components._animator.SetBool("isCrawl", true);
             components._collider.height = controller.body.CrawlSize;
+            controller.mainCamera.camera.transform.localPosition = Vector3.zero;
+
+            if (horizontal == 0f && vertical == 0f)
+                components._animatorPlayer.SetInteger("IdMove", 2);
+            else
+                components._animatorPlayer.SetInteger("IdMove", 1);
         }
     }
+
     private void MoveBody(float horizontal, float vertical, float speed, float staminaNeed)
     {
         if (controller.parameters.stamina.Stamina < (controller.parameters.stamina.Max * 0.25))
@@ -259,6 +285,7 @@ public class Player : NetworkBehaviour
             controller.parameters.stamina.OldValue = controller.parameters.stamina.BarDiff.fillAmount;
 
             components._rigidbody.velocity = new Vector3(0, force, 0);
+            components._animatorPlayer.SetInteger("IdMove", 4);
         }
     }
 
