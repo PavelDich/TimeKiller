@@ -265,7 +265,7 @@ public class Player : NetworkBehaviour
     public void MoveHead(float mouseX, float mouseY, float sensitivityX, float sensitivityY)
     {
         controller.mainCamera.eulerX -= mouseY * sensitivityY * Time.deltaTime;
-        controller.mainCamera.eulerX = Mathf.Clamp(controller.mainCamera.eulerX, -80f, 80f);
+        controller.mainCamera.eulerX = Mathf.Clamp(controller.mainCamera.eulerX, -80f, 55f);
         controller.mainCamera.heck.transform.localRotation = Quaternion.Euler(controller.mainCamera.eulerX, 0, 0);
 
         controller.mainCamera.eulerY = (transform.rotation.eulerAngles.y + mouseX * sensitivityX * Time.deltaTime) % 360;
