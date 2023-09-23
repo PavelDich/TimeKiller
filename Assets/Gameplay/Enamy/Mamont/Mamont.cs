@@ -1,5 +1,4 @@
 using System.Security.Principal;
-using Mirror;
 using UnityEngine;
 
 public class Mamont : Enemy
@@ -46,13 +45,12 @@ public class Mamont : Enemy
     //        isAgr = false;
     //    }
     //}
-
-    //private void OnCollisionEnter(Collision col)
-    //{
-    //    if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
-    //    {
-    //        Player pl = col.gameObject.GetComponent<Player>();
-    //        pl.ChangeHealth(pl.controller.parameters.health.Health - Damage);
-    //    }
-    //}
+    private void OnCollisionEnter(Collision col)
+    {
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
+        {
+            Player pl = col.gameObject.GetComponent<Player>();
+            //pl.Parameters.health -= Damage;
+        }
+    }
 }
