@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class poop : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    public float Damage;
+    public LayerMask playerLayer;
+    private void OnTriggerEnter(Collider col)
     {
-        Debug.Log("Damage");
+        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
+        {
+            Player pl = col.GetComponent<Player>();
+            pl.ChangeHealth(pl.controller.parameters.health.Health - Damage);
+        }
     }
 }

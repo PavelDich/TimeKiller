@@ -8,7 +8,7 @@ public class Monkey : Enemy
     private bool isAgr;
     private bool _isShooting = false;
     [SerializeField] private GameObject monkey;
-    [SerializeField] private GameObject bullet;
+    [SerializeField] private poop bullet;
     [SerializeField] Transform spawnBullet;
     [SerializeField] private float speedBullet;
 
@@ -62,10 +62,10 @@ public class Monkey : Enemy
 
     public void Shoot()
     {
-        Debug.Log("shot");
         if (_isShooting == true) return;
         _isShooting = true;
-        GameObject bulletObject = Instantiate(bullet, spawnBullet.position, spawnBullet.rotation);
+        poop bulletObject = Instantiate(bullet, spawnBullet.position, spawnBullet.rotation);
+        bulletObject.Damage = Damage;
         Rigidbody rb = bulletObject.GetComponent<Rigidbody>();
         rb.AddForce(transform.forward * speedBullet, ForceMode.Impulse);
         _resetIshoting = 5;
@@ -73,7 +73,7 @@ public class Monkey : Enemy
         StartCoroutine(ResetIsShooting());
     }
 
-    private IEnumerator DestroyBullet(GameObject bullet)
+    private IEnumerator DestroyBullet(poop bullet)
     {
         yield return new WaitForSeconds(5f);
         Destroy(bullet);

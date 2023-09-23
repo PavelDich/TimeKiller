@@ -2408,6 +2408,37 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &4708352119257083769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 863912624669565251}
+  m_Layer: 3
+  m_Name: HandL
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &863912624669565251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4708352119257083769}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.175, y: -0.2, z: 0.275}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1134601823934218611}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4794453759372023283
 GameObject:
   m_ObjectHideFlags: 0
@@ -3934,7 +3965,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7798609786131221924}
   m_Layer: 3
-  m_Name: Hand
+  m_Name: HandR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3949,7 +3980,7 @@ Transform:
   m_GameObject: {fileID: 6707384605076585180}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.173, y: -0.203, z: 0.258}
+  m_LocalPosition: {x: 0.175, y: -0.2, z: 0.275}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4310,15 +4341,19 @@ MonoBehaviour:
       JumpForce: 5
       JumpStaminaNeed: 10
       hands:
-        hand: {fileID: 7798609786131221924}
-        handId: 0
-        HandsScale: 10
-        MaskItems:
+        layerItem:
           serializedVersion: 2
           m_Bits: 256
-        maxItems: 10
-        items: []
-        DropItem: {x: 0, y: 0, z: 0}
+        GrabDistance: 15
+        DropVelocity: {x: 0, y: 0, z: 0}
+        RightHand: {fileID: 7798609786131221924}
+        InRightHand: {fileID: 0}
+        InRightHandRigidbody: {fileID: 0}
+        InRightHandLayer: 0
+        LeftHand: {fileID: 863912624669565251}
+        InLeftHand: {fileID: 0}
+        InLeftHandRigidbody: {fileID: 0}
+        InLeftHandLayer: 0
   _Health: 100
 --- !u!114 &4283717276732832772
 MonoBehaviour:
@@ -4821,6 +4856,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7798609786131221924}
+  - {fileID: 863912624669565251}
   m_Father: {fileID: 5213665116111648100}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4494215917640909045

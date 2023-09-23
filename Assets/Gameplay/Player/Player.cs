@@ -107,15 +107,25 @@ public class Player : NetworkBehaviour
             [System.Serializable]
             public class Hands
             {
-                public Transform hand;
-                public int handId;
-                public float HandsScale;
-                [Header("Items")]
-                public LayerMask MaskItems;
-                public int maxItems;
-                public Item[] items;
+                public LayerMask layerItem;
+                public int GrabDistance;
+                public Vector3 DropVelocity;
 
-                public Vector3 DropItem;
+                [Header("Right")]
+                public Transform RightHand;
+                public Item InRightHand;
+                [HideInInspector]
+                public Rigidbody InRightHandRigidbody;
+                [HideInInspector]
+                public int InRightHandLayer;
+
+                [Header("Left")]
+                public Transform LeftHand;
+                public Item InLeftHand;
+                [HideInInspector]
+                public Rigidbody InLeftHandRigidbody;
+                [HideInInspector]
+                public int InLeftHandLayer;
             }
         }
     }
@@ -179,16 +189,8 @@ public class Player : NetworkBehaviour
             {
                 MoveHead(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), controller.mainCamera.SensativityX, controller.mainCamera.SensativityY);
                 if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
-                //if (Input.GetKeyDown(KeyCode.B)) Manager.gameManager.ChangeIsGameStarted(!Manager.gameManager._isGameStarted);
-                if (Input.GetMouseButtonDown(1))
-                {
-                    Item i = Physics.RaycastAll(controller.mainCamera.camera.transform.position,
-                        controller.mainCamera.camera.transform.forward,
-                        controller.body.hands.HandsScale,
-                        controller.body.hands.MaskItems)[0].collider.GetComponent<Item>();
-                    if (i != null) AddHands(i);
-                }
-                SetHands();
+                if (Input.GetMouseButtonDown(0)) GrabItemLeft();
+                if (Input.GetMouseButtonDown(1)) GrabItemRight();
             }
             else Move(0f, 0f, false, false);
 
@@ -202,7 +204,55 @@ public class Player : NetworkBehaviour
 
 
 
+    public void GrabItemLeft()
+    {
+        if (controller.body.hands.InLeftHand == null)
+        {
+            RaycastHit[] ray = Physics.RaycastAll(controller.mainCamera.camera.transform.position,
+            controller.mainCamera.camera.transform.forward, controller.body.hands.GrabDistance, controller.body.hands.layerItem);
 
+            if (ray.Length > 0)
+            {
+                controller.body.hands.InLeftHand = ray[0].collider.gameObject.GetComponent<Item>();
+                controller.body.hands.InLeftHandRigidbody = controller.body.hands.InLeftHand.GetComponent<Rigidbody>();
+            }
+        }
+        else
+        {
+            controller.body.hands.InLeftHand.transform.SetParent(null, true);
+            controller.body.hands.InLeftHandRigidbody.isKinematic = false;
+            controller.body.hands.InLeftHandRigidbody.AddRelativeForce(controller.body.hands.DropVelocity);
+            controller.body.hands.InLeftHand = null;
+        }
+    }
+
+    public void GrabItemRight()
+    {
+        if (controller.body.hands.InRightHand == null)
+        {
+            RaycastHit[] ray = Physics.RaycastAll(controller.mainCamera
+            .camera.transform.position,
+            controller.mainCamera.camera.transform.forward, controller.body.hands.GrabDistance, controller.body.hands.layerItem);
+
+            if (ray.Length > 0)
+            {
+                controller.body.hands.InRightHand = ray[0].collider.gameObject.GetComponent<Item>();
+                controller.body.hands.InRightHandRigidbody = controller.body.hands.InRightHand.GetComponent<Rigidbody>();
+
+                controller.body.hands.InRightHand.transform.SetParent(controller.body.hands.RightHand.gameObject.transform, false);
+                controller.body.hands.InRightHandRigidbody.isKinematic = true;
+                controller.body.hands.InRightHand.transform.position = controller.body.hands.RightHand.position;
+                controller.body.hands.InRightHand.transform.rotation = controller.body.hands.RightHand.rotation;
+            }
+        }
+        else
+        {
+            controller.body.hands.InRightHand.transform.SetParent(null, true);
+            controller.body.hands.InRightHandRigidbody.isKinematic = false;
+            controller.body.hands.InRightHandRigidbody.AddRelativeForce(controller.body.hands.DropVelocity);
+            controller.body.hands.InRightHand = null;
+        }
+    }
 
     public void OpenMenu()
     {
@@ -334,57 +384,6 @@ public class Player : NetworkBehaviour
 
         controller.mainCamera.eulerY = (transform.rotation.eulerAngles.y + mouseX * sensitivityX * Time.deltaTime) % 360;
         transform.rotation = Quaternion.Euler(0, controller.mainCamera.eulerY, 0);
-    }
-
-    public void AddHands(Item item)
-    {
-        if (controller.body.hands.items[controller.body.hands.handId] == null)
-        {
-            item.transform.SetParent(controller.body.hands.hand, false);
-            item.GetComponent<Rigidbody>().isKinematic = true;
-            item.transform.position = controller.body.hands.hand.transform.position;
-            item.transform.rotation = controller.body.hands.hand.transform.rotation;
-        };
-    }
-
-    public void SetHands()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) controller.body.hands.handId = 1;
-        if (Input.GetKeyDown(KeyCode.Alpha2)) controller.body.hands.handId = 2;
-        if (Input.GetKeyDown(KeyCode.Alpha3)) controller.body.hands.handId = 3;
-        if (Input.GetKeyDown(KeyCode.Alpha4)) controller.body.hands.handId = 4;
-        if (Input.GetKeyDown(KeyCode.Alpha5)) controller.body.hands.handId = 5;
-        if (Input.GetKeyDown(KeyCode.Alpha6)) controller.body.hands.handId = 6;
-        if (Input.GetKeyDown(KeyCode.Alpha7)) controller.body.hands.handId = 7;
-        if (Input.GetKeyDown(KeyCode.Alpha8)) controller.body.hands.handId = 8;
-        if (Input.GetKeyDown(KeyCode.Alpha9)) controller.body.hands.handId = 9;
-        if (Input.GetKeyDown(KeyCode.Alpha0)) controller.body.hands.handId = 0;
-        if (Input.GetAxis("Mouse ScrollWheel") > 0.1)
-            controller.body.hands.handId++;
-        if (Input.GetAxis("Mouse ScrollWheel") < -0.1)
-            controller.body.hands.handId--;
-
-        if (controller.body.hands.handId > controller.body.hands.maxItems)
-            controller.body.hands.handId = 0;
-
-
-        for (int i = 0; i < controller.body.hands.items.Length; i++)
-        {
-            if (i == controller.body.hands.handId)
-                controller.body.hands.items[controller.body.hands.handId].gameObject.SetActive(true);
-            else
-                controller.body.hands.items[controller.body.hands.handId].gameObject.SetActive(false);
-        }
-
-        if (Input.GetMouseButtonDown(0) && controller.body.hands.items[controller.body.hands.handId] != null)
-            controller.body.hands.items[controller.body.hands.handId].Use();
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            controller.body.hands.items[controller.body.hands.handId].transform.SetParent(null, false);
-            controller.body.hands.items[controller.body.hands.handId].GetComponent<Rigidbody>().isKinematic = false;
-            controller.body.hands.items[controller.body.hands.handId].GetComponent<Rigidbody>().AddForce(controller.body.hands.DropItem);
-        }
     }
 
 
