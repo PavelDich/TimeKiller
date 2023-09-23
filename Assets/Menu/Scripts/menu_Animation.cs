@@ -1,14 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class menu_Animation : MonoBehaviour
 {
-    private Animator Anim;
-    private void Start()
-    {
-        Anim = GetComponent<Animator>();
-    }
+    public Animator Anim;
 
     public void menu_ID(int menu_ID)
     {
@@ -17,5 +11,10 @@ public class menu_Animation : MonoBehaviour
     public void menu_Layer(int menu_Layer)
     {
         Anim.SetInteger("Layer", menu_Layer);
+    }
+
+    public void menu_bool(string BoolName)
+    {
+        Anim.SetBool(BoolName, !Anim.GetBool(BoolName));
     }
 }

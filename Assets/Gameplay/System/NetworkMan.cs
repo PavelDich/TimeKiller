@@ -1,6 +1,8 @@
 using Mirror;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class NetworkMan : NetworkManager
 {
@@ -30,6 +32,13 @@ public class NetworkMan : NetworkManager
     public override void OnClientConnect()
     {
         base.OnClientConnect();
+        Manager.players = FindObjectsOfType<Player>();
+    }
+
+    public override void OnClientDisconnect()
+    {
+        base.OnClientDisconnect();
+        Manager.players = FindObjectsOfType<Player>();
     }
 
 

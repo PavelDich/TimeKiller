@@ -25,16 +25,8 @@ public class Player : NetworkBehaviour
     [System.Serializable]
     public class Controller
     {
-        public ID iD;
-        [System.Serializable]
-        public class ID
-        {
-            public int id;
-            public Obj[] obj;
-            [System.Serializable]
-            public class Obj
-            { public GameObject[] o; }
-        }
+        public bool isActive;
+        public GameObject[] localObjects;
         public Parameters parameters;
         [System.Serializable]
         public class Parameters
@@ -133,17 +125,15 @@ public class Player : NetworkBehaviour
     private void Start()
     {
         if (!isOwned)
-            Destroy(controller.mainCamera.camera.gameObject);
+            foreach (GameObject i in controller.localObjects)
+                Destroy(i);
         else
-        {
             SettingsImport();
-            Cursor.lockState = CursorLockMode.Locked;
-        }
     }
 
     private void FixedUpdate()
     {
-        if (isOwned)
+        if (isOwned && controller.isActive)
         {
             Move(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), Input.GetKey(KeyCode.LeftShift), Input.GetKey(KeyCode.LeftControl));
         }
@@ -153,24 +143,17 @@ public class Player : NetworkBehaviour
     {
         if (isOwned)
         {
-            MoveHead(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), controller.mainCamera.SensativityX, controller.mainCamera.SensativityY);
-            if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
-            Parameters();
-            if (Input.GetKeyDown(KeyCode.H)) ChangeHealth(controller.parameters.health.Health - 10);
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (controller.isActive)
             {
-                if (components._animatorMenu.GetBool("isActive"))
-                {
-                    components._animatorMenu.SetBool("isActive", false);
-                    Cursor.lockState = CursorLockMode.Locked;
-                    SettingsImport();
-                }
-                else
-                {
-                    components._animatorMenu.SetBool("isActive", true);
-                    Cursor.lockState = CursorLockMode.None;
-                }
+                MoveHead(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), controller.mainCamera.SensativityX, controller.mainCamera.SensativityY);
+                if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
+                Parameters();
+                if (Input.GetKeyDown(KeyCode.H)) ChangeHealth(controller.parameters.health.Health - 10);
+                if (Input.GetKeyDown(KeyCode.V)) Manager.gameManager.isGameStarted = !Manager.gameManager.isGameStarted;
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+                OpenMenu();
         }
     }
 
@@ -180,19 +163,18 @@ public class Player : NetworkBehaviour
 
 
 
+    public void OpenMenu()
+    {
+        controller.isActive = !controller.isActive;
+        components._animatorMenu.SetBool("isActive", !controller.isActive);
+        Cursor.visible = !controller.isActive;
+        SettingsImport();
+    }
+
     public void SettingsImport()
     {
         controller.mainCamera.SensativityX = float.Parse(PlayerPrefs.GetString("SettingsPlayerCameraSensitivityX"));
         controller.mainCamera.SensativityY = float.Parse(PlayerPrefs.GetString("SettingsPlayerCameraSensitivityY"));
-        controller.iD.id = PlayerPrefs.GetInt("ControllerID");
-        for (int i = 0; i < controller.iD.obj.Length; i++)
-        {
-            foreach (GameObject e in controller.iD.obj[i].o)
-            {
-                if (i == controller.iD.id) e.SetActive(true);
-                else e.SetActive(false);
-            }
-        };
     }
 
     public void Parameters()
