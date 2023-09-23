@@ -16,7 +16,7 @@ public class Mamont : Enemy
             _timeLeftWander = timeWander;
         }
 
-        if (pathfinder.isStopped)
+        if (pathfinder.velocity.magnitude <= 0.15f)
             enamyAnim.SetInteger("IdMove", 0);
         else enamyAnim.SetInteger("IdMove", 1);
     }
@@ -51,7 +51,8 @@ public class Mamont : Enemy
     {
         if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
         {
-            enamyAnim.SetInteger("IdMove", 2);
+            Player pl = col.gameObject.GetComponent<Player>();
+            pl.ChangeHealth(pl.controller.parameters.health.Health - Damage);
         }
     }
 }

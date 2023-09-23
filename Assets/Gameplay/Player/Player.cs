@@ -32,6 +32,7 @@ public class Player : NetworkBehaviour
         [System.Serializable]
         public class Parameters
         {
+            public bool isDeath;
             public Heal health;
             [System.Serializable]
             public class Heal
@@ -101,6 +102,19 @@ public class Player : NetworkBehaviour
             public float rayDistance = 0.6f;
             public float JumpForce = 5f;
             public float JumpStaminaNeed = 20f;
+
+            public Hands hands;
+            [System.Serializable]
+            public class Hands
+            {
+                public Transform hand;
+                public int handId;
+                public float HandsScale;
+                [Header("Items")]
+                public LayerMask MaskItems;
+                public int maxItems;
+                public Item[] items;
+            }
         }
     }
 
@@ -120,7 +134,17 @@ public class Player : NetworkBehaviour
         void CmdSyncHealth(float newValue)
         { _Health = newValue; }
     }
-    public void SetHealth(float oldValue, float newValue) { controller.parameters.health.Health = newValue; }
+    public void SetHealth(float oldValue, float newValue)
+    {
+        controller.parameters.health.Health = newValue;
+        if (controller.parameters.health.Health <= 0f) controller.parameters.isDeath = true;
+        else controller.parameters.isDeath = false;
+        if (newValue <= oldValue)
+        {
+            controller.parameters.health.RegenReloadTimeLeft = controller.parameters.health.RegenReload;
+            controller.parameters.health.OldValue = controller.parameters.health.BarDiff.fillAmount;
+        }
+    }
     #endregion
 
 
@@ -138,25 +162,34 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (isOwned && controller.isActive)
+        if (isOwned && controller.isActive && !controller.parameters.isDeath)
         {
             Move(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), Input.GetKey(KeyCode.LeftShift), Input.GetKey(KeyCode.LeftControl));
         }
+        else Move(0f, 0f, false, false);
     }
 
     private void Update()
     {
         if (isOwned)
         {
-            if (controller.isActive)
+            if (controller.isActive && !controller.parameters.isDeath)
             {
                 MoveHead(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), controller.mainCamera.SensativityX, controller.mainCamera.SensativityY);
                 if (Input.GetKeyDown(KeyCode.Space)) MoveJump(controller.body.JumpForce);
-                Parameters();
-                if (Input.GetKeyDown(KeyCode.H)) ChangeHealth(controller.parameters.health.Health - 10);
-                if (Input.GetKeyDown(KeyCode.B)) Manager.gameManager.ChangeIsGameStarted(!Manager.gameManager._isGameStarted);
+                //if (Input.GetKeyDown(KeyCode.B)) Manager.gameManager.ChangeIsGameStarted(!Manager.gameManager._isGameStarted);
+                if (Input.GetMouseButtonDown(1))
+                {
+                    AddHands(Physics.RaycastAll(controller.mainCamera.camera.transform.position,
+                        controller.mainCamera.camera.transform.forward,
+                        controller.body.hands.HandsScale,
+                        controller.body.hands.MaskItems)[0].collider.GetComponent<Item>());
+                    SetHands();
+                }
             }
+            else Move(0f, 0f, false, false);
 
+            Parameters();
             if (Input.GetKeyDown(KeyCode.Escape))
                 OpenMenu();
         }
@@ -170,7 +203,6 @@ public class Player : NetworkBehaviour
 
     public void OpenMenu()
     {
-        Move(0f, 0f, false, true);
         controller.isActive = !controller.isActive;
         components._animatorMenu.SetBool("isActive", !controller.isActive);
         Cursor.visible = !controller.isActive;
@@ -185,14 +217,16 @@ public class Player : NetworkBehaviour
 
     public void Parameters()
     {
+        controller.parameters.health.RegenReloadTimeLeft -= Time.deltaTime;
         if (controller.parameters.health.Bar != null && controller.parameters.health.BarDiff != null)
         {
-            if (controller.parameters.health.Health < controller.parameters.health.Max)
+            if (controller.parameters.health.Health > 0f && controller.parameters.health.Health < controller.parameters.health.Max && controller.parameters.health.RegenReloadTimeLeft <= 0)
                 controller.parameters.health.Health += controller.parameters.health.Regen * Time.deltaTime;
 
             controller.parameters.health.Bar.fillAmount = controller.parameters.health.Health / controller.parameters.health.Max;
+            controller.parameters.health.BarDiff.fillAmount =
+            Mathf.Lerp(controller.parameters.health.Bar.fillAmount, controller.parameters.health.OldValue, controller.parameters.health.RegenReloadTimeLeft / controller.parameters.health.RegenReload);
         }
-
         controller.parameters.stamina.RegenReloadTimeLeft -= Time.deltaTime;
         if (controller.parameters.stamina.Bar != null && controller.parameters.stamina.BarDiff != null)
         {
@@ -297,6 +331,36 @@ public class Player : NetworkBehaviour
 
         controller.mainCamera.eulerY = (transform.rotation.eulerAngles.y + mouseX * sensitivityX * Time.deltaTime) % 360;
         transform.rotation = Quaternion.Euler(0, controller.mainCamera.eulerY, 0);
+    }
+
+    public void AddHands(Item item)
+    {
+        if (controller.body.hands.items[controller.body.hands.handId] = null) controller.body.hands.items[controller.body.hands.handId] = item;
+    }
+
+    public void SetHands()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) controller.body.hands.handId = 1;
+        if (Input.GetKeyDown(KeyCode.Alpha2)) controller.body.hands.handId = 2;
+        if (Input.GetKeyDown(KeyCode.Alpha3)) controller.body.hands.handId = 3;
+        if (Input.GetKeyDown(KeyCode.Alpha4)) controller.body.hands.handId = 4;
+        if (Input.GetKeyDown(KeyCode.Alpha5)) controller.body.hands.handId = 5;
+        if (Input.GetKeyDown(KeyCode.Alpha6)) controller.body.hands.handId = 6;
+        if (Input.GetKeyDown(KeyCode.Alpha7)) controller.body.hands.handId = 7;
+        if (Input.GetKeyDown(KeyCode.Alpha8)) controller.body.hands.handId = 8;
+        if (Input.GetKeyDown(KeyCode.Alpha9)) controller.body.hands.handId = 9;
+        if (Input.GetKeyDown(KeyCode.Alpha0)) controller.body.hands.handId = 0;
+        if (Input.GetAxis("Mouse ScrollWheel") > 0.1)
+            controller.body.hands.handId++;
+        if (Input.GetAxis("Mouse ScrollWheel") < -0.1)
+            controller.body.hands.handId--;
+
+        if (controller.body.hands.handId > controller.body.hands.maxItems)
+            controller.body.hands.handId = 0;
+
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        { controller.body.hands.items[controller.body.hands.handId].gameObject.SetActive(true);}
     }
 
 
