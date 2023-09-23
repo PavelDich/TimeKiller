@@ -6,8 +6,6 @@ public class Mamont : Enemy
 {
     private bool isAgr;
 
-
-
     private void Update()
     {
         _timeLeftWander -= Time.deltaTime;
@@ -44,13 +42,5 @@ public class Mamont : Enemy
         }
     }
 
-    private void OnCollisionEnter(Collision col)
-    {
-        if ((~playerLayer & (1 << col.gameObject.layer)) == 0)
-        {
-            Debug.Log("Damage");
-            ChangeHealth(Health - 1);
-            pathfinder.speed = 3.5f;
-        }
-    }
+   
 }
